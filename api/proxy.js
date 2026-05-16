@@ -2,22 +2,22 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = (req, res) => {
   const proxy = createProxyMiddleware({
-    // ترافیک به سمت سرور شما هدایت می‌شود
-    target: 'http://103.83.86.162:20113', 
+    // آدرس آی‌پی و پورت پنل شما
+    target: 'http://103.83.86.162:10985', 
     changeOrigin: true,
-    ws: true, // فعال‌سازی وب‌ساکت برای تونل V2Ray
-    pathRewrite: {
-      '^/api/proxy': '', // حذف مسیر /api/proxy از درخواست نهایی
-    },
+    ws: true,
     onProxyReq: (proxyReq, req, res) => {
-      // اضافه کردن هدر برای پایداری بیشتر
-      proxyReq.setHeader('Host', '103.83.86.162');
+      // تنظیم هدر Host که برای پنل شما حیاتی است
+      proxyReq.setHeader('Host', 'cdn.milatimarket.shop');
+    },
+    pathRewrite: {
+      '^/api/proxy': '', // حذف /api/proxy برای فرستادن بقیه آدرس به سرور
+    },
+    onProxyRes: (proxyRes, req, res) => {
+      proxyRes.headers['Access-Control-Allow-Origin'] = '*';
     },
     onError: (err, req, res) => {
-      res.writeHead(500, {
-        'Content-Type': 'text/plain',
-      });
-      res.end('Proxy Error: ' + err.message);
+      res.end('Error connecting to Server: ' + err.message);
     }
   });
 
